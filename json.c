@@ -739,4 +739,59 @@ void json_value_free (json_value * value)
    }
 }
 
+void json_value_dump(FILE * fp, json_value const * v) {
+	void (* const rec)(FILE * fp, json_value const * v) = json_value_dump;
 
+	assert(fp);
+	assert(v);
+	{
+		unsigned int i;
+		switch (v->type) {
+		case json_none:	// ??
+			fprintf(fp, "none");
+			break;
+		case json_object:
+			fprintf(fp, "{");
+			if (v->u.object.length >= 1) {
+				fprintf(fp, "\"%s\":", v->u.object.values[0].name);
+				rec(fp, v->u.object.values[0].value);
+			}
+			for (i=1; i<v->u.object.length; ++i) {
+				fprintf(fp, ",");
+				fprintf(fp, "\"%s:\"", v->u.object.values[i].name);
+				rec(fp, v->u.object.values[i].value);
+			}
+			fprintf(fp, "}");
+			break;
+		case json_array:
+			fprintf(fp, "[");
+			if (v->u.array.length >= 1) {
+				rec(fp, v->u.array.values[0]);
+			}
+			for (i=1; i<v->u.array.length; ++i) {
+				fprintf(fp, ",");
+				rec(fp, v->u.array.values[i]);
+			}
+			fprintf(fp, "]");
+			break;
+		case json_integer:
+			fprintf(fp, "%ld", v->u.integer);
+			break;
+		case json_double:
+			fprintf(fp, "%lf", v->u.dbl);
+			break;
+		case json_string:
+			fprintf(fp, "\"%s\"", v->u.string.ptr);
+			break;
+		case json_boolean:
+			fprintf(fp, v->u.boolean ? "true" : "false");
+			break;
+		case json_null:
+			fprintf(fp, "null");
+			break;
+		default:
+			fprintf(stderr, "unknown format json value is passed\n");
+			break;
+		}
+	}
+}

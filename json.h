@@ -31,6 +31,8 @@
 #ifndef _JSON_H
 #define _JSON_H
 
+#include <stdio.h>
+
 #ifndef json_char
    #define json_char char
 #endif
@@ -182,6 +184,7 @@ json_value * json_parse_ex
 
 void json_value_free (json_value *);
 
+void json_value_dump(FILE * fp, json_value const * v);
 
 #ifdef __cplusplus
    } /* extern "C" */
