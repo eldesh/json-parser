@@ -28,13 +28,18 @@
  * SUCH DAMAGE.
  */
 
-#include "json.h"
-
-#ifdef _MSC_VER
-   #ifndef _CRT_SECURE_NO_WARNINGS
-      #define _CRT_SECURE_NO_WARNINGS
-   #endif
+#if defined _WIN32
+#  pragma warning (push)
+#  pragma warning (disable : 4996)
 #endif
+
+#ifdef __cplusplus
+#  include <cassert>
+#else
+#  include <assert.h>
+#endif
+
+#include "json.h"
 
 #ifdef __cplusplus
    const struct _json_value json_value_none; /* zero-d by ctor */
