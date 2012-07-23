@@ -763,7 +763,7 @@ void json_value_dump(FILE * fp, json_value const * v) {
 			}
 			for (i=1; i<v->u.object.length; ++i) {
 				fprintf(fp, ",");
-				fprintf(fp, "\"%s:\"", v->u.object.values[i].name);
+				fprintf(fp, "\"%s\":", v->u.object.values[i].name);
 				rec(fp, v->u.object.values[i].value);
 			}
 			fprintf(fp, "}");
