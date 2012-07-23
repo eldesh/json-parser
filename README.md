@@ -18,6 +18,15 @@ API
     void json_value_free
         (json_value *);
 
+	void json_value_dump
+		(FILE * fp, json_value const * v);
+
+	bool json_value_equal
+		(json_value const * lhs, json_value const * rhs);
+
+	json_value const * find_json_object
+		(json_value const * v, char const * field);
+
 The `type` field of `json_value` is one of:
 
 * `json_object` (see `u.object.length`, `u.object.values[x].name`, `u.object.values[x].value`)
