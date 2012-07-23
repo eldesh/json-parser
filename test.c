@@ -22,10 +22,6 @@
 #  define SEP "/"
 #endif
 
-#if !defined __cplusplus
-typedef enum { false=0, true } bool;
-#endif
-
 static char const * valid_files[] = {
 	"valid-0000.json",	"valid-0001.json",
 	"valid-0002.json",	"valid-0003.json"
@@ -78,15 +74,103 @@ bool test_json_parse_file(char const * dir, char const * filename) {
 	buf = read_file(path);
 	if (buf) {
 		json_value * v = json_parse(buf);
-		if (v) {
-			json_value_free(v);
-			return true;
-		} else
-			return false;
+		return json_value_free(v), v!=NULL;
 	} else {
 		fprintf(stderr, "read file <%s> failed\n", path);
 		return false;
 	}
+}
+
+bool test_json_parse (char const * s) {
+	json_value * v = json_parse(s);
+	json_value_free(v);
+	if (v)
+		printf("test parse (%s) passed\n", s);
+	else
+		printf("test parse (%s) failed\n", s);
+	return v!=NULL;
+}
+
+bool test_find_json_object(void) {
+	json_value * v = json_parse("{\"foo\":314}");
+	bool r = v && find_json_object(v, "foo") ;
+	return false;
+}
+
+#if defined _WIN32
+#  define __func__ __FUNCTION__
+#endif
+
+#define TEST_JSON_VALUE_CMP(cmp, lhs, rhs)                             \
+		do {                                                           \
+			json_value * lhs_ = (lhs);                                 \
+			json_value * rhs_ = (rhs);                                 \
+			printf("%20s:%5d@%-10s: ", __FILE__, __LINE__, __func__);  \
+			if (cmp(lhs_, rhs_)) {                                     \
+				printf("passed\n");                                    \
+			} else {                                                   \
+				json_value_dump(stdout, lhs);                          \
+				printf(" != ");                                        \
+				json_value_dump(stdout, rhs);						   \
+				printf("\n");                                          \
+			}                                                          \
+			json_value_free(lhs_);                                     \
+			json_value_free(rhs_);                                     \
+		} while (0)
+
+#define TEST_JSON_VALUE_EQ(lhs, rhs)     TEST_JSON_VALUE_CMP( json_value_equal, lhs, rhs)
+#define TEST_JSON_VALUE_NOT_EQ(lhs, rhs) TEST_JSON_VALUE_CMP(!json_value_equal, lhs, rhs)
+
+void test_json_value_equal(void) {
+	json_value * lhs = NULL;
+	json_value * rhs = NULL;
+	// expect equal
+	TEST_JSON_VALUE_EQ(NULL, NULL);
+	TEST_JSON_VALUE_EQ(json_parse("314"), json_parse("314"));
+	TEST_JSON_VALUE_EQ(json_parse("null"), json_parse("null"));
+	TEST_JSON_VALUE_EQ(json_parse("{}"), json_parse("{}"));
+	TEST_JSON_VALUE_EQ(json_parse("[]"), json_parse("[]"));
+	TEST_JSON_VALUE_EQ(json_parse("[1,2,3]"), json_parse("[1,2,3]"));
+	TEST_JSON_VALUE_EQ(json_parse("[]"), json_parse("[]"));
+	TEST_JSON_VALUE_EQ(json_parse("\"\""), json_parse("\"\""));
+	TEST_JSON_VALUE_EQ(json_parse("\"foo\""), json_parse("\"foo\""));
+	TEST_JSON_VALUE_EQ(json_parse("\"foo bar bazz\""), json_parse("\"foo bar bazz\""));
+	TEST_JSON_VALUE_EQ(json_parse("[7298,\"\",{}]")  , json_parse("[7298,\"\",{}]"));
+	TEST_JSON_VALUE_EQ(json_parse("{\"foo\":123}"), json_parse("{\"foo\":123}"));
+	TEST_JSON_VALUE_EQ(json_parse("{\"test.c\":256, \"json.c\":512}"), json_parse("{\"json.c\":512, \"test.c\":256}"));
+	TEST_JSON_VALUE_EQ(json_parse("{\"alice\":[12,\"white rabbit\"] \
+								,   \"knight\":[\"KJQ\" \
+												, \"as the Knight fell heavily on the top of his head exactly in the path where Alice was walking.\"]}")
+					,  json_parse("{\"knight\":[\"KJQ\" \
+												, \"as the Knight fell heavily on the top of his head exactly in the path where Alice was walking.\"] \
+								,   \"alice\":[12,\"white rabbit\"]}"));
+	TEST_JSON_VALUE_EQ(json_parse("{\"define\": [\"fib\", [\"lambda\", \"x\" \
+															, [\"cond\", \
+																[[\"eq\", \"x\", 0], 1], \
+																[[\"eq\", \"x\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"x\", 1]], [\"fib\", [\"-\", \"x\", 2]]]]]]]]}")
+					,  json_parse("{\"define\": [\"fib\", [\"lambda\", \"x\" \
+															, [\"cond\", \
+																[[\"eq\", \"x\", 0], 1], \
+																[[\"eq\", \"x\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"x\", 1]], [\"fib\", [\"-\", \"x\", 2]]]]]]]]}"));
+
+	// expect *not* equal
+	TEST_JSON_VALUE_NOT_EQ(json_parse("[]"), json_parse("{}"));
+	TEST_JSON_VALUE_NOT_EQ(json_parse("1.42"), json_parse("1.42"));
+	TEST_JSON_VALUE_NOT_EQ(json_parse("\"foo bar bazz\""), json_parse("\"foo bar bazz \""));
+	TEST_JSON_VALUE_NOT_EQ(json_parse("\" foo bar bazz\""), json_parse("\"foo bar bazz\""));
+	TEST_JSON_VALUE_NOT_EQ(json_parse("[20, 30, 40]"), json_parse("[30, 40, 20]"));
+	TEST_JSON_VALUE_NOT_EQ(json_parse("{\"define\": [\"fib\", [\"lambda\", \"x\" \
+															, [\"cond\", \
+																[[\"eq\", \"x\", 0], 1], \
+																[[\"eq\", \"x\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"x\", 1]], [\"fib\", [\"-\", \"x\", 2]]]]]]]]}")
+						,  json_parse("{\"define\": [\"fib\", [\"lambda\", \"y\" \
+															, [\"cond\", \
+																[[\"eq\", \"y\", 0], 1], \
+																[[\"eq\", \"y\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"y\", 1]], [\"fib\", [\"-\", \"y\", 2]]]]]]]]}"));
 }
 
 int main () {
@@ -101,5 +185,6 @@ int main () {
 		printf("test json_parse(%s) is %s\n", invalid_files[i]
 					, !test_json_parse_file("tests", invalid_files[i]) ? "pass" : "fail");
 	}
+	test_json_value_equal();
 	return 0;
 }

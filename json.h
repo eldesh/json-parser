@@ -37,6 +37,10 @@
    #define json_char char
 #endif
 
+#if !defined __cplusplus
+typedef enum { false=0, true } bool;
+#endif
+
 #ifdef __cplusplus
 
    #include <string.h>
@@ -185,6 +189,8 @@ json_value * json_parse_ex
 void json_value_free (json_value *);
 
 void json_value_dump(FILE * fp, json_value const * v);
+bool json_value_equal(json_value const * lhs, json_value const * rhs);
+json_value const * find_json_object(json_value const * v, char const * field);
 
 #ifdef __cplusplus
    } /* extern "C" */

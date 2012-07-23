@@ -748,8 +748,7 @@ void json_value_dump(FILE * fp, json_value const * v) {
 	void (* const rec)(FILE * fp, json_value const * v) = json_value_dump;
 
 	assert(fp);
-	assert(v);
-	{
+	if (v) {
 		unsigned int i;
 		switch (v->type) {
 		case json_none:	// ??
@@ -798,5 +797,68 @@ void json_value_dump(FILE * fp, json_value const * v) {
 			fprintf(stderr, "unknown format json value is passed\n");
 			break;
 		}
-	}
+	} else
+		fprintf(fp, "(NULL)");
 }
+
+// implies
+#define IMP(p,q) ((!(p)) || ((p) && (q)))
+
+static bool json_value_object_equal(json_value const * lhs, json_value const * rhs) {
+	unsigned int i;
+	if (lhs==rhs)
+		return true;  // given values are same object
+	if (lhs->type!=json_object || rhs->type!=json_object)
+		return false; // type mismatch
+	if (lhs->u.object.length != rhs->u.object.length)
+		return false; // number of fields mismatch
+	for (i=0; i<lhs->u.object.length; ++i) {
+      // compare without ordering
+      json_value const * v = find_json_object(rhs, lhs->u.object.values[i].name);
+      if (!(v && json_value_equal(v, lhs->u.object.values[i].value)))
+			return false;
+	}
+	return true;
+}
+
+static bool json_value_array_equal(json_value const * lhs, json_value const * rhs) {
+	int i;
+	if (lhs==rhs)
+		return true;  // given values are same object
+	if (lhs->type!=json_array || rhs->type!=json_array)
+		return false; // type mismatch
+	if (lhs->u.array.length != rhs->u.array.length)
+		return false; // number of fields mismatch
+	for (i=0; i<lhs->u.array.length; ++i) {
+		if (!json_value_equal(lhs->u.array.values[i], rhs->u.array.values[i]))
+			return false;
+	}
+	return true;
+}
+
+bool json_value_equal(json_value const * lhs, json_value const * rhs) {
+	if (lhs==rhs)
+		return true;
+	return lhs->type==rhs->type
+		&& IMP(lhs->type==json_none   , true)
+		&& IMP(lhs->type==json_object , json_value_object_equal(lhs, rhs))
+		&& IMP(lhs->type==json_array  , json_value_array_equal (lhs, rhs))
+		&& IMP(lhs->type==json_integer, lhs->u.integer==rhs->u.integer)
+		&& IMP(lhs->type==json_double , false) // can't declare valid comparison function
+		&& IMP(lhs->type==json_string , lhs->u.string.length==rhs->u.string.length
+									&& !strcmp(lhs->u.string.ptr, rhs->u.string.ptr))
+		&& IMP(lhs->type==json_boolean, lhs->u.boolean==rhs->u.boolean)
+		&& IMP(lhs->type==json_null   , true);
+}
+
+json_value const * find_json_object(json_value const * v, char const * field) {
+	if (v && v->type == json_object) {
+		unsigned int i;
+		for (i=0; i<v->u.object.length; ++i) {
+			if (!strcmp(v->u.object.values[i].name, field))
+				return v->u.object.values[i].value;
+		}
+	}
+	return NULL;
+}
+
