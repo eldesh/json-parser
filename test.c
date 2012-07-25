@@ -185,6 +185,7 @@ void test_json_type_equal (void) {
 	TEST_JSON_TYPE_EQ(json_parse("{}"), json_parse("{}"));
 	TEST_JSON_TYPE_EQ(json_parse("[]"), json_parse("[]"));
 	TEST_JSON_TYPE_EQ(json_parse("[1,2,3]"), json_parse("[1,2,3]"));
+	TEST_JSON_TYPE_EQ(json_parse("[1,[2,[3]]]"), json_parse("[1, [2, [ 3] ]]"));
 	TEST_JSON_TYPE_EQ(json_parse("[]"), json_parse("[]"));
 	TEST_JSON_TYPE_EQ(json_parse("\"\""), json_parse("\"\""));
 	TEST_JSON_TYPE_EQ(json_parse("\"foo\""), json_parse("\"foo\""));
@@ -212,6 +213,7 @@ void test_json_type_equal (void) {
 	// expect *not* equal
 	TEST_JSON_TYPE_NOT_EQ(json_parse("[]"), json_parse("{}"));
 	TEST_JSON_TYPE_NOT_EQ(json_parse("1.42"), json_parse("[1.42]"));
+	TEST_JSON_TYPE_NOT_EQ(json_parse("[1,[2,[3,[{}]]]]"), json_parse("[1,[2,[3]]]"));
 	TEST_JSON_TYPE_NOT_EQ(json_parse("\"foo bar bazz\""), json_parse("{\"\":\"foo bar bazz \"}"));
 	TEST_JSON_TYPE_NOT_EQ(json_parse("[\"foo\", \"bar\", \"bazz\"]"), json_parse("[\"foo\" \"bazz\", \"bar\"]"));
 	TEST_JSON_TYPE_NOT_EQ(json_parse("[20, 30, 40]"), json_parse("[30, [40, [20]]]"));

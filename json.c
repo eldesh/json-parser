@@ -803,11 +803,12 @@ void json_value_dump(FILE * fp, json_value const * v) {
 
 // implies
 #define IMP(p,q) ((!(p)) || ((p) && (q)))
+#define XOR(x,y) (((x) && (!(y))) || ((!(x)) && (y)))
 
 static bool json_value_object_equal(json_value const * lhs, json_value const * rhs) {
 	unsigned int i;
-	if (lhs==rhs)
-		return true;  // given values are same object
+	if (lhs==rhs)		return true;  // given values are same object
+	if (XOR(lhs, rhs))	return false;
 	if (lhs->type!=json_object || rhs->type!=json_object)
 		return false; // type mismatch
 	if (lhs->u.object.length != rhs->u.object.length)
@@ -822,9 +823,9 @@ static bool json_value_object_equal(json_value const * lhs, json_value const * r
 }
 
 static bool json_value_array_equal(json_value const * lhs, json_value const * rhs) {
-	int i;
-	if (lhs==rhs)
-		return true;  // given values are same object
+	unsigned int i;
+	if (lhs==rhs)		return true;  // given values are same object
+	if (XOR(lhs, rhs))	return false;
 	if (lhs->type!=json_array || rhs->type!=json_array)
 		return false; // type mismatch
 	if (lhs->u.array.length != rhs->u.array.length)
@@ -837,10 +838,10 @@ static bool json_value_array_equal(json_value const * lhs, json_value const * rh
 }
 
 bool json_value_equal(json_value const * lhs, json_value const * rhs) {
-	if (lhs==rhs)
-		return true;
+	if (lhs==rhs)		return true;
+	if (XOR(lhs, rhs))	return false;
 	return lhs->type==rhs->type
-		&& IMP(lhs->type==json_none   , true)
+		&& IMP(lhs->type==json_none   , false)
 		&& IMP(lhs->type==json_object , json_value_object_equal(lhs, rhs))
 		&& IMP(lhs->type==json_array  , json_value_array_equal (lhs, rhs))
 		&& IMP(lhs->type==json_integer, lhs->u.integer==rhs->u.integer)
@@ -850,8 +851,6 @@ bool json_value_equal(json_value const * lhs, json_value const * rhs) {
 		&& IMP(lhs->type==json_boolean, lhs->u.boolean==rhs->u.boolean)
 		&& IMP(lhs->type==json_null   , true);
 }
-
-#define XOR(x,y) (((x) && (!(y))) || ((!(x)) && (y)))
 
 static bool json_object_type_equal(json_value const * lhs, json_value const * rhs) {
 	unsigned int i;
