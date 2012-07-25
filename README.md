@@ -24,6 +24,9 @@ API
 	bool json_value_equal
 		(json_value const * lhs, json_value const * rhs);
 
+	bool json_type_equal
+		(json_value const * lhs, json_value const * rhs);
+
 	json_value const * find_json_object
 		(json_value const * v, char const * field);
 
