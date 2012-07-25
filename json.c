@@ -851,6 +851,56 @@ bool json_value_equal(json_value const * lhs, json_value const * rhs) {
 		&& IMP(lhs->type==json_null   , true);
 }
 
+#define XOR(x,y) (((x) && (!(y))) || ((!(x)) && (y)))
+
+static bool json_object_type_equal(json_value const * lhs, json_value const * rhs) {
+	unsigned int i;
+	if (lhs==rhs)		return true;  // given values are same object
+	if (XOR(lhs, rhs))	return false;
+	if (lhs->type!=json_object || rhs->type!=json_object)
+		return false; // type mismatch
+	if (lhs->u.object.length != rhs->u.object.length)
+		return false; // number of fields mismatch
+	for (i=0; i<lhs->u.object.length; ++i) {
+      // compare without ordering
+      json_value const * v = find_json_object(rhs, lhs->u.object.values[i].name);
+      if (!(v && json_type_equal(v, lhs->u.object.values[i].value)))
+			return false;
+	}
+	return true;
+}
+
+static bool json_array_type_equal(json_value const * lhs, json_value const * rhs) {
+	unsigned int i;
+	if (lhs==rhs)		return true;  // given values are same object
+	if (XOR(lhs, rhs))	return false;
+	if (lhs->type!=json_array || rhs->type!=json_array)
+		return false; // type mismatch
+	if (lhs->u.array.length != rhs->u.array.length)
+		return false; // number of fields mismatch
+	for (i=0; i<lhs->u.array.length; ++i) {
+		if (!json_type_equal(lhs->u.array.values[i], rhs->u.array.values[i]))
+			return false;
+	}
+	return true;
+}
+
+bool json_type_equal (json_value const * lhs, json_value const * rhs) {
+	if (lhs==rhs)		return true;
+	if (XOR(lhs, rhs))	return false;
+	return lhs->type == rhs->type
+		&& IMP(lhs->type==json_none   , false)
+		&& IMP(lhs->type==json_object , json_object_type_equal(lhs, rhs)) //
+		&& IMP(lhs->type==json_array  , json_array_type_equal (lhs, rhs)) // compare recursively
+		&& IMP(lhs->type==json_integer, true)
+		&& IMP(lhs->type==json_double , true)
+		&& IMP(lhs->type==json_string , true)
+		&& IMP(lhs->type==json_boolean, true)
+		&& IMP(lhs->type==json_null   , true);
+}
+
+#undef XOR
+
 json_value const * find_json_object(json_value const * v, char const * field) {
 	if (v && v->type == json_object) {
 		unsigned int i;

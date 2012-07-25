@@ -120,6 +120,8 @@ bool test_find_json_object(void) {
 
 #define TEST_JSON_VALUE_EQ(lhs, rhs)     TEST_JSON_VALUE_CMP( json_value_equal, lhs, rhs)
 #define TEST_JSON_VALUE_NOT_EQ(lhs, rhs) TEST_JSON_VALUE_CMP(!json_value_equal, lhs, rhs)
+#define TEST_JSON_TYPE_EQ(lhs, rhs)      TEST_JSON_VALUE_CMP(  json_type_equal, lhs, rhs)
+#define TEST_JSON_TYPE_NOT_EQ(lhs, rhs)  TEST_JSON_VALUE_CMP( !json_type_equal, lhs, rhs)
 
 void test_json_value_equal(void) {
 	json_value * lhs = NULL;
@@ -173,6 +175,58 @@ void test_json_value_equal(void) {
 																[[\"other\", [\"+\", [\"fib\", [\"-\", \"y\", 1]], [\"fib\", [\"-\", \"y\", 2]]]]]]]]}"));
 }
 
+void test_json_type_equal (void) {
+	json_value * lhs = NULL;
+	json_value * rhs = NULL;
+	// expect equal
+	TEST_JSON_TYPE_EQ(NULL, NULL);
+	TEST_JSON_TYPE_EQ(json_parse("314"), json_parse("314"));
+	TEST_JSON_TYPE_EQ(json_parse("null"), json_parse("null"));
+	TEST_JSON_TYPE_EQ(json_parse("{}"), json_parse("{}"));
+	TEST_JSON_TYPE_EQ(json_parse("[]"), json_parse("[]"));
+	TEST_JSON_TYPE_EQ(json_parse("[1,2,3]"), json_parse("[1,2,3]"));
+	TEST_JSON_TYPE_EQ(json_parse("[]"), json_parse("[]"));
+	TEST_JSON_TYPE_EQ(json_parse("\"\""), json_parse("\"\""));
+	TEST_JSON_TYPE_EQ(json_parse("\"foo\""), json_parse("\"foo\""));
+	TEST_JSON_TYPE_EQ(json_parse("\"foo bar bazz\""), json_parse("\"foo bar bazz\""));
+	TEST_JSON_TYPE_EQ(json_parse("[7298,\"\",{}]")  , json_parse("[7298,\"\",{}]"));
+	TEST_JSON_TYPE_EQ(json_parse("{\"foo\":123}"), json_parse("{\"foo\":123}"));
+	TEST_JSON_TYPE_EQ(json_parse("{\"test.c\":256, \"json.c\":512}"), json_parse("{\"json.c\":512, \"test.c\":256}"));
+	TEST_JSON_TYPE_EQ(json_parse("{\"alice\":[12,\"white rabbit\"] \
+								,   \"knight\":[\"KJQ\" \
+												, \"as the Knight fell heavily on the top of his head exactly in the path where Alice was walking.\"]}")
+					,  json_parse("{\"knight\":[\"KJQ\" \
+												, \"as the Knight fell heavily on the top of his head exactly in the path where Alice was walking.\"] \
+								,   \"alice\":[12,\"white rabbit\"]}"));
+	TEST_JSON_TYPE_EQ(json_parse("{\"define\": [\"fib\", [\"lambda\", \"x\" \
+															, [\"cond\", \
+																[[\"eq\", \"x\", 0], 1], \
+																[[\"eq\", \"x\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"x\", 1]], [\"fib\", [\"-\", \"x\", 2]]]]]]]]}")
+					,  json_parse("{\"define\": [\"fib\", [\"lambda\", \"x\" \
+															, [\"cond\", \
+																[[\"eq\", \"x\", 0], 1], \
+																[[\"eq\", \"x\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"x\", 1]], [\"fib\", [\"-\", \"x\", 2]]]]]]]]}"));
+
+	// expect *not* equal
+	TEST_JSON_TYPE_NOT_EQ(json_parse("[]"), json_parse("{}"));
+	TEST_JSON_TYPE_NOT_EQ(json_parse("1.42"), json_parse("[1.42]"));
+	TEST_JSON_TYPE_NOT_EQ(json_parse("\"foo bar bazz\""), json_parse("{\"\":\"foo bar bazz \"}"));
+	TEST_JSON_TYPE_NOT_EQ(json_parse("[\"foo\", \"bar\", \"bazz\"]"), json_parse("[\"foo\" \"bazz\", \"bar\"]"));
+	TEST_JSON_TYPE_NOT_EQ(json_parse("[20, 30, 40]"), json_parse("[30, [40, [20]]]"));
+	TEST_JSON_TYPE_NOT_EQ(json_parse("{\"define\": [\"fib\", [\"lambda\", \"x\" \
+															, {\"cond\": [\
+																[[\"eq\", \"x\", 0], 1], \
+																[[\"eq\", \"x\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"x\", 1]], [\"fib\", [\"-\", \"x\", 2]]]]]]}]]}")
+						,  json_parse("{\"define\": [\"fib\", [\"lambda\", \"y\" \
+															, [\"cond\", \
+																[[\"eq\", \"y\", 0], 1], \
+																[[\"eq\", \"y\", 1], 1], \
+																[[\"other\", [\"+\", [\"fib\", [\"-\", \"y\", 1]], [\"fib\", [\"-\", \"y\", 2]]]]]]]]}"));
+}
+
 int main () {
 	int i;
 	for (i=0; i<valid_file_size; ++i) {
@@ -186,5 +240,6 @@ int main () {
 					, !test_json_parse_file("tests", invalid_files[i]) ? "pass" : "fail");
 	}
 	test_json_value_equal();
+	test_json_type_equal ();
 	return 0;
 }

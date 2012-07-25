@@ -189,7 +189,10 @@ json_value * json_parse_ex
 void json_value_free (json_value *);
 
 void json_value_dump(FILE * fp, json_value const * v);
+// compare json values
 bool json_value_equal(json_value const * lhs, json_value const * rhs);
+// compare type(schemas) of json values
+bool json_type_equal (json_value const * lhs, json_value const * rhs);
 json_value const * find_json_object(json_value const * v, char const * field);
 
 #ifdef __cplusplus
