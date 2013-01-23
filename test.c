@@ -107,7 +107,7 @@ bool test_find_json_object(void) {
 			json_value * rhs_ = (rhs);                                 \
 			printf("%20s:%5d@%-10s: ", __FILE__, __LINE__, __func__);  \
 			if (cmp(lhs_, rhs_)) {                                     \
-				printf("passed\n");                                    \
+				printf("pass\n");                                      \
 			} else {                                                   \
 				json_value_dump(stdout, lhs);                          \
 				printf(" != ");                                        \
