@@ -13,6 +13,7 @@
 # include <assert.h>
 #endif
 #include <error.h>
+#include <errno.h>
 
 #include "json.h"
 
@@ -35,7 +36,7 @@ static char const * invalid_files[] = {
 };
 static int const invalid_file_size = sizeof(invalid_files)/sizeof(invalid_files[0]);
 
-static int file_size(FILE * fp) {
+static long file_size(FILE * fp) {
 	int curr = ftell(fp);
 	int size=0;
 	fseek(fp, 0   , SEEK_END); // begin of fp
@@ -54,7 +55,7 @@ char * read_file (char const * file) {
 		char * buf = (char*)malloc(size > 1 ? size : 1); // avoid undefined behaviour
 		if (buf) {
 			size_t rsize = fread(buf, 1, size, fp);
-			if (rsize==-1) {
+			if (rsize<(size_t)size) {
 				fprintf(stderr, "%s\n", strerror(errno));
 				free(buf);
 			} else {
@@ -93,8 +94,7 @@ bool test_json_parse (char const * s) {
 
 bool test_find_json_object(void) {
 	json_value * v = json_parse("{\"foo\":314}");
-	bool r = v && find_json_object(v, "foo") ;
-	return false;
+	return v && find_json_object(v, "foo") ;
 }
 
 #if defined _WIN32
@@ -124,8 +124,6 @@ bool test_find_json_object(void) {
 #define TEST_JSON_TYPE_NOT_EQ(lhs, rhs)  TEST_JSON_VALUE_CMP( !json_type_equal, lhs, rhs)
 
 void test_json_value_equal(void) {
-	json_value * lhs = NULL;
-	json_value * rhs = NULL;
 	// expect equal
 	TEST_JSON_VALUE_EQ(NULL, NULL);
 	TEST_JSON_VALUE_EQ(json_parse("314"), json_parse("314"));
@@ -176,8 +174,6 @@ void test_json_value_equal(void) {
 }
 
 void test_json_type_equal (void) {
-	json_value * lhs = NULL;
-	json_value * rhs = NULL;
 	// expect equal
 	TEST_JSON_TYPE_EQ(NULL, NULL);
 	TEST_JSON_TYPE_EQ(json_parse("314"), json_parse("314"));
