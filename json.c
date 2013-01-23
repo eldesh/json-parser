@@ -93,7 +93,7 @@ static void * json_alloc (json_state * state, unsigned long size, int zero)
       return 0;
    }
 
-   if (! (mem = zero ? calloc (size, 1) : malloc (size)))
+   if (! (mem = zero ? malloc(1l) : malloc (size)))
       return 0;
 
    return mem;
