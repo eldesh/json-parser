@@ -157,6 +157,7 @@ void test_json_value_equal(void) {
 
 	// expect *not* equal
 	TEST_JSON_VALUE_NOT_EQ(json_parse("[]"), json_parse("{}"));
+	TEST_JSON_VALUE_NOT_EQ(json_parse("314"), json_parse("315"));
 	TEST_JSON_VALUE_NOT_EQ(json_parse("1.42"), json_parse("1.42"));
 	TEST_JSON_VALUE_NOT_EQ(json_parse("\"foo bar bazz\""), json_parse("\"foo bar bazz \""));
 	TEST_JSON_VALUE_NOT_EQ(json_parse("\" foo bar bazz\""), json_parse("\"foo bar bazz\""));
@@ -177,6 +178,8 @@ void test_json_type_equal (void) {
 	// expect equal
 	TEST_JSON_TYPE_EQ(NULL, NULL);
 	TEST_JSON_TYPE_EQ(json_parse("314"), json_parse("314"));
+	TEST_JSON_TYPE_EQ(json_parse("234"), json_parse("678"));
+	TEST_JSON_TYPE_EQ(json_parse("0"), json_parse("1"));
 	TEST_JSON_TYPE_EQ(json_parse("null"), json_parse("null"));
 	TEST_JSON_TYPE_EQ(json_parse("{}"), json_parse("{}"));
 	TEST_JSON_TYPE_EQ(json_parse("[]"), json_parse("[]"));
