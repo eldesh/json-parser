@@ -186,7 +186,10 @@ json_value * json_parse
 json_value * json_parse_ex
    (json_settings * settings, const json_char * json, char * error);
 
+json_value * json_value_dup(json_value const * json);
 void json_value_free (json_value *);
+
+char const * json_type_to_string(json_type ty) ;
 
 void json_value_dump(FILE * fp, json_value const * v);
 // compare json values
@@ -194,6 +197,8 @@ bool json_value_equal(json_value const * lhs, json_value const * rhs);
 // compare type(schemas) of json values
 bool json_type_equal (json_value const * lhs, json_value const * rhs);
 json_value const * find_json_object(json_value const * v, char const * field);
+// is_array && all (= ty) js
+bool all_array_type(json_type ty, json_value const * js);
 
 #ifdef __cplusplus
    } /* extern "C" */

@@ -18,6 +18,9 @@ API
     void json_value_free
         (json_value *);
 
+    json_value * json_value_dup
+        (json_value const *);
+
 	void json_value_dump
 		(FILE * fp, json_value const * v);
 
