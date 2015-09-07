@@ -32,12 +32,9 @@
 #define _JSON_H
 
 #include <stdio.h>
+#include "json_config.h"
 
-#ifndef json_char
-   #define json_char char
-#endif
-
-#if !defined __cplusplus
+#if HAVE__BOOL == 0
 typedef enum { false=0, true } bool;
 #endif
 
