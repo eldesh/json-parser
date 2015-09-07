@@ -51,6 +51,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
+#include <float.h>
 
 typedef unsigned short json_uchar;
 
@@ -989,5 +991,220 @@ json_value * json_value_dup(json_value const * json) {
       return NULL;
    }
    return json_;
+}
+
+
+//
+// constructor
+//
+json_value json_from_bool  (bool b) {
+	json_value t = json_value_none;
+	t.type = json_boolean;
+	t.u.boolean = b;
+	return t;
+}
+
+json_value json_from_int   (int x) {
+	json_value t = json_value_none;
+	t.type = json_integer;
+	t.u.integer = x;
+	return t;
+}
+
+json_value json_from_string(char const * str) {
+	json_value t = json_value_none;
+	t.type = json_string;
+	t.u.string.length = strlen(str);
+#if defined WIN32
+	t.u.string.ptr    = _strdup(str);
+#else
+	t.u.string.ptr    = strdup(str);
+#endif
+	return t;
+}
+
+json_value json_from_real(double r) {
+	json_value t = json_value_none;
+	t.type = json_double;
+	t.u.dbl = r;
+	return t;
+}
+
+
+//
+// discriminator
+//
+bool is_json_string (json_value v) { return v.type==json_string; }
+bool is_json_number (json_value v) { return v.type==json_integer || v.type==json_double; }
+bool is_json_array  (json_value v) { return v.type==json_array ; }
+bool is_json_object (json_value v) { return v.type==json_object; }
+
+
+//
+// accessor
+//
+bool read_json_if_uint(unsigned int * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+         && 0u <= v->u.integer
+         && v->u.integer <= UINT_MAX)
+   {
+      *x = v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+
+bool read_json_if_int(int * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& INT_MIN <= v->u.integer
+			&& v->u.integer <= INT_MAX) {
+		*x = v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_uint8_t(uint8_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& 0 <= v->u.integer
+			&& v->u.integer <= UINT8_MAX)
+	{
+		*x = (uint8_t)v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_uint16_t(uint16_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& 0 <= v->u.integer
+			&& v->u.integer <= UINT16_MAX)
+	{
+		*x = (uint16_t)v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_uint32_t(uint32_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& 0 <= v->u.integer
+			&& v->u.integer <= UINT32_MAX)
+	{
+		*x = (uint32_t)v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_uint64_t(uint64_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& 0 <= v->u.integer
+			//&& v->u.integer <= UINT32_MAX
+         )
+	{
+		*x = (uint32_t)v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_int8_t(int8_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& INT8_MIN <= v->u.integer
+			&& v->u.integer <= INT8_MAX)
+	{
+		*x = (int8_t)v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_int16_t(int16_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& INT16_MIN <= v->u.integer
+			&& v->u.integer <= INT16_MAX)
+	{
+		*x = (int16_t)v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_int32_t(int32_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			&& INT32_MIN <= v->u.integer
+			&& v->u.integer <= INT32_MAX)
+	{
+		*x = v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_int64_t(int64_t * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_integer
+			// && INT64_MIN <= v->u.integer
+			// && v->u.integer <= INT64_MAX
+         )
+	{
+		*x = v->u.integer;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_float(float * f, json_value const * v) {
+	assert(f);
+	if (v && v->type==json_double
+			&& FLT_MIN <= v->u.dbl
+			&& v->u.dbl <= FLT_MAX)
+	{
+		*f = v->u.dbl;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_double(double * d, json_value const * v) {
+	assert(d);
+	if (v && v->type==json_double
+			// && FLT_MIN <= v->u.dbl
+			// && v->u.dbl <= FLT_MAX
+         )
+	{
+		*d = v->u.dbl;
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_string(char * ss, json_value const * v) {
+	assert(ss);
+	if (v && v->type==json_string) {
+		strncpy(ss, v->u.string.ptr, 256);
+		return true;
+	} else
+		return false;
+}
+
+bool read_json_if_bool(bool * x, json_value const * v) {
+	assert(x);
+	if (v && v->type==json_boolean) {
+		*x = v->u.boolean;
+		return true;
+	} else
+		return false;
 }
 
