@@ -1213,7 +1213,7 @@ bool json_value_read_if_string(char * ss, json_value const * v) {
 bool json_value_read_if_bool(bool * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_boolean) {
-		*x = v->u.boolean;
+		*x = v->u.boolean != 0;
 		return true;
 	} else
 		return false;

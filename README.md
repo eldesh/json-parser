@@ -36,7 +36,8 @@ Very low footprint JSON parser written in portable ANSI C.
 
 Read a C typed value from json\_value .
 
-    bool json_value_read_if_<type> (<type> * x, json_value const * v);
+    bool json_value_read_if_<type>
+        (<type> * x, json_value const * v);
 
 Supported types are below:
 
