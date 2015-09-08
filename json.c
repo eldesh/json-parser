@@ -53,6 +53,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <float.h>
+#include <errno.h>
 
 typedef unsigned short json_uchar;
 
@@ -255,7 +256,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             }
 
             if (string_length > state.uint_max)
-               goto e_overflow;
+               goto e_toolong;
 
             if (flags & flag_escaped)
             {
@@ -488,10 +489,15 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
                            if (state.first_pass)
                               continue;
 
-                           if (top->type == json_double)
+                           if (top->type == json_double) {
                               top->u.dbl = strtod (i, (json_char **) &i);
-                           else
+                              if (errno == ERANGE)
+                                 goto e_overflow;
+                           } else {
                               top->u.integer = strtol (i, (json_char **) &i, 10);
+                              if (errno == ERANGE)
+                                 goto e_overflow;
+                           }
 
                            flags |= flag_next | flag_reproc;
                         }
@@ -634,7 +640,7 @@ json_value * json_parse_ex (json_settings * settings, const json_char * json, ch
             }
 
             if ( (++ top->parent->u.array.length) > state.uint_max)
-               goto e_overflow;
+               goto e_toolong;
 
             top = top->parent;
 
@@ -659,7 +665,12 @@ e_alloc_failure:
 
 e_overflow:
 
-   sprintf (error, "%d:%d: Too long (caught overflow)", cur_line, e_off);
+   sprintf (error, "%d:%d: numeral parser have occurred overflow", cur_line, e_off);
+   goto e_failed;
+
+e_toolong:
+
+   sprintf (error, "%d:%d: Too long size object", cur_line, e_off);
    goto e_failed;
 
 e_failed:
