@@ -201,42 +201,42 @@ bool all_array_type(json_type ty, json_value const * js);
 //
 // constructor
 //
-json_value json_from_bool  (bool b);
-json_value json_from_int   (int x);
-json_value json_from_string(char const * str);
-json_value json_from_real  (double r);
+json_value json_value_from_bool  (bool b);
+json_value json_value_from_int   (int x);
+json_value json_value_from_string(char const * str);
+json_value json_value_from_real  (double r);
 
 //
 // discriminator
 //
-bool is_json_string (json_value v);
-bool is_json_number (json_value v);
-bool is_json_array  (json_value v);
-bool is_json_object (json_value v);
-bool is_json_value_t(json_value v);
+bool json_value_is_string (json_value v);
+bool json_value_is_number (json_value v);
+bool json_value_is_array  (json_value v);
+bool json_value_is_object (json_value v);
+bool json_value_is_value_t(json_value v);
 
 //
-// accessor
+// reader
 //
-bool read_json_if_uint    (unsigned int * x, json_value const * v);
-bool read_json_if_int     (         int * x, json_value const * v);
+bool json_value_read_if_uint    (unsigned int * x, json_value const * v);
+bool json_value_read_if_int     (         int * x, json_value const * v);
 
-bool read_json_if_uint8_t (uint8_t      * x, json_value const * v);
-bool read_json_if_uint16_t(uint16_t     * x, json_value const * v);
-bool read_json_if_uint32_t(uint32_t     * x, json_value const * v);
-bool read_json_if_uint64_t(uint64_t     * x, json_value const * v);
+bool json_value_read_if_uint8_t (uint8_t      * x, json_value const * v);
+bool json_value_read_if_uint16_t(uint16_t     * x, json_value const * v);
+bool json_value_read_if_uint32_t(uint32_t     * x, json_value const * v);
+bool json_value_read_if_uint64_t(uint64_t     * x, json_value const * v);
 
-bool read_json_if_int8_t  ( int8_t      * x, json_value const * v);
-bool read_json_if_int16_t ( int16_t     * x, json_value const * v);
-bool read_json_if_int32_t ( int32_t     * x, json_value const * v);
-bool read_json_if_int64_t ( int64_t     * x, json_value const * v);
+bool json_value_read_if_int8_t  ( int8_t      * x, json_value const * v);
+bool json_value_read_if_int16_t ( int16_t     * x, json_value const * v);
+bool json_value_read_if_int32_t ( int32_t     * x, json_value const * v);
+bool json_value_read_if_int64_t ( int64_t     * x, json_value const * v);
 
-bool read_json_if_float   ( float       * f, json_value const * v);
-bool read_json_if_double  ( double      * d, json_value const * v);
+bool json_value_read_if_float   ( float       * f, json_value const * v);
+bool json_value_read_if_double  ( double      * d, json_value const * v);
 
-bool read_json_if_string(char * ss, json_value const * v);
+bool json_value_read_if_string(char * ss, json_value const * v);
 
-bool read_json_if_bool(bool * b, json_value const * v);
+bool json_value_read_if_bool(bool * b, json_value const * v);
 
 
 #ifdef __cplusplus

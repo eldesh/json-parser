@@ -6,8 +6,7 @@ Very low footprint JSON parser written in portable ANSI C.
 
 [![Build Status](https://secure.travis-ci.org/udp/json-parser.png)](http://travis-ci.org/udp/json-parser)
 
-API
----
+# API
 
     json_value * json_parse
         (const json_char * json);
@@ -32,6 +31,21 @@ API
 
 	json_value const * find_json_object
 		(json_value const * v, char const * field);
+
+## Reader
+
+Read a C typed value from json\_value .
+
+    bool json_value_read_if_<type> (<type> * x, json_value const * v);
+
+Supported types are below:
+
+    int, uint
+    uint8_t, uint16_t, uint32_t, uint64_t
+    int8_t, int16_t, int32_t, int64_t
+    float, double
+    string, bool
+
 
 The `type` field of `json_value` is one of:
 

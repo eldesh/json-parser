@@ -997,21 +997,21 @@ json_value * json_value_dup(json_value const * json) {
 //
 // constructor
 //
-json_value json_from_bool  (bool b) {
+json_value json_value_from_bool  (bool b) {
 	json_value t = json_value_none;
 	t.type = json_boolean;
 	t.u.boolean = b;
 	return t;
 }
 
-json_value json_from_int   (int x) {
+json_value json_value_from_int   (int x) {
 	json_value t = json_value_none;
 	t.type = json_integer;
 	t.u.integer = x;
 	return t;
 }
 
-json_value json_from_string(char const * str) {
+json_value json_value_from_string(char const * str) {
 	json_value t = json_value_none;
 	t.type = json_string;
 	t.u.string.length = strlen(str);
@@ -1023,7 +1023,7 @@ json_value json_from_string(char const * str) {
 	return t;
 }
 
-json_value json_from_real(double r) {
+json_value json_value_from_real(double r) {
 	json_value t = json_value_none;
 	t.type = json_double;
 	t.u.dbl = r;
@@ -1034,16 +1034,16 @@ json_value json_from_real(double r) {
 //
 // discriminator
 //
-bool is_json_string (json_value v) { return v.type==json_string; }
-bool is_json_number (json_value v) { return v.type==json_integer || v.type==json_double; }
-bool is_json_array  (json_value v) { return v.type==json_array ; }
-bool is_json_object (json_value v) { return v.type==json_object; }
+bool json_value_is_string (json_value v) { return v.type==json_string; }
+bool json_value_is_number (json_value v) { return v.type==json_integer || v.type==json_double; }
+bool json_value_is_array  (json_value v) { return v.type==json_array ; }
+bool json_value_is_object (json_value v) { return v.type==json_object; }
 
 
 //
 // accessor
 //
-bool read_json_if_uint(unsigned int * x, json_value const * v) {
+bool json_value_read_if_uint(unsigned int * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
          && 0u <= v->u.integer
@@ -1056,7 +1056,7 @@ bool read_json_if_uint(unsigned int * x, json_value const * v) {
 }
 
 
-bool read_json_if_int(int * x, json_value const * v) {
+bool json_value_read_if_int(int * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& INT_MIN <= v->u.integer
@@ -1067,7 +1067,7 @@ bool read_json_if_int(int * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_uint8_t(uint8_t * x, json_value const * v) {
+bool json_value_read_if_uint8_t(uint8_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& 0 <= v->u.integer
@@ -1079,7 +1079,7 @@ bool read_json_if_uint8_t(uint8_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_uint16_t(uint16_t * x, json_value const * v) {
+bool json_value_read_if_uint16_t(uint16_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& 0 <= v->u.integer
@@ -1091,7 +1091,7 @@ bool read_json_if_uint16_t(uint16_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_uint32_t(uint32_t * x, json_value const * v) {
+bool json_value_read_if_uint32_t(uint32_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& 0 <= v->u.integer
@@ -1103,7 +1103,7 @@ bool read_json_if_uint32_t(uint32_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_uint64_t(uint64_t * x, json_value const * v) {
+bool json_value_read_if_uint64_t(uint64_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& 0 <= v->u.integer
@@ -1116,7 +1116,7 @@ bool read_json_if_uint64_t(uint64_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_int8_t(int8_t * x, json_value const * v) {
+bool json_value_read_if_int8_t(int8_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& INT8_MIN <= v->u.integer
@@ -1128,7 +1128,7 @@ bool read_json_if_int8_t(int8_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_int16_t(int16_t * x, json_value const * v) {
+bool json_value_read_if_int16_t(int16_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& INT16_MIN <= v->u.integer
@@ -1140,7 +1140,7 @@ bool read_json_if_int16_t(int16_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_int32_t(int32_t * x, json_value const * v) {
+bool json_value_read_if_int32_t(int32_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			&& INT32_MIN <= v->u.integer
@@ -1152,7 +1152,7 @@ bool read_json_if_int32_t(int32_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_int64_t(int64_t * x, json_value const * v) {
+bool json_value_read_if_int64_t(int64_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
 			// && INT64_MIN <= v->u.integer
@@ -1165,7 +1165,7 @@ bool read_json_if_int64_t(int64_t * x, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_float(float * f, json_value const * v) {
+bool json_value_read_if_float(float * f, json_value const * v) {
 	assert(f);
 	if (v && v->type==json_double
 			&& FLT_MIN <= v->u.dbl
@@ -1177,7 +1177,7 @@ bool read_json_if_float(float * f, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_double(double * d, json_value const * v) {
+bool json_value_read_if_double(double * d, json_value const * v) {
 	assert(d);
 	if (v && v->type==json_double
 			// && FLT_MIN <= v->u.dbl
@@ -1190,7 +1190,7 @@ bool read_json_if_double(double * d, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_string(char * ss, json_value const * v) {
+bool json_value_read_if_string(char * ss, json_value const * v) {
 	assert(ss);
 	if (v && v->type==json_string) {
 		strncpy(ss, v->u.string.ptr, 256);
@@ -1199,7 +1199,7 @@ bool read_json_if_string(char * ss, json_value const * v) {
 		return false;
 }
 
-bool read_json_if_bool(bool * x, json_value const * v) {
+bool json_value_read_if_bool(bool * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_boolean) {
 		*x = v->u.boolean;
