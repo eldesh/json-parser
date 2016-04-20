@@ -36,7 +36,7 @@
 #include "json_config.h"
 
 #if HAVE__BOOL == 0
-typedef enum { false=0, true } bool;
+#  include <stdbool.h>
 #endif
 
 #ifdef __cplusplus
