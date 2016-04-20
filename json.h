@@ -225,11 +225,15 @@ bool json_value_read_if_uint8_t (uint8_t      * x, json_value const * v);
 bool json_value_read_if_uint16_t(uint16_t     * x, json_value const * v);
 bool json_value_read_if_uint32_t(uint32_t     * x, json_value const * v);
 bool json_value_read_if_uint64_t(uint64_t     * x, json_value const * v);
+bool json_value_read_if_uintptr_t(uintptr_t   * x, json_value const * v);
 
 bool json_value_read_if_int8_t  ( int8_t      * x, json_value const * v);
 bool json_value_read_if_int16_t ( int16_t     * x, json_value const * v);
 bool json_value_read_if_int32_t ( int32_t     * x, json_value const * v);
 bool json_value_read_if_int64_t ( int64_t     * x, json_value const * v);
+bool json_value_read_if_intptr_t( intptr_t    * x, json_value const * v);
+
+bool json_value_read_if_size_t  ( size_t      * x, json_value const * v);
 
 bool json_value_read_if_float   ( float       * f, json_value const * v);
 bool json_value_read_if_double  ( double      * d, json_value const * v);

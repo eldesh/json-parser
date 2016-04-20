@@ -1060,7 +1060,7 @@ bool json_value_read_if_uint(unsigned int * x, json_value const * v) {
          && 0u <= v->u.integer
          && v->u.integer <= UINT_MAX)
    {
-      *x = v->u.integer;
+      *x = (unsigned int)v->u.integer;
 		return true;
 	} else
 		return false;
@@ -1127,6 +1127,19 @@ bool json_value_read_if_uint64_t(uint64_t * x, json_value const * v) {
 		return false;
 }
 
+bool json_value_read_if_uintptr_t(uintptr_t * x, json_value const * v) {
+   assert(x);
+   if (v && v->type==json_integer
+         && 0 <= v->u.integer
+         && v->u.integer <= UINTPTR_MAX)
+   {
+      *x = (uintptr_t)v->u.integer;
+      return true;
+   } else
+      return false;
+}
+
+
 bool json_value_read_if_int8_t(int8_t * x, json_value const * v) {
 	assert(x);
 	if (v && v->type==json_integer
@@ -1174,6 +1187,30 @@ bool json_value_read_if_int64_t(int64_t * x, json_value const * v) {
 		return true;
 	} else
 		return false;
+}
+
+bool json_value_read_if_intptr_t(intptr_t * x, json_value const * v) {
+   assert(x);
+   if (v && v->type==json_integer
+         && INTPTR_MIN <= v->u.integer
+         && v->u.integer <= INTPTR_MAX)
+   {
+      *x = (intptr_t)v->u.integer;
+      return true;
+   } else
+      return false;
+}
+
+bool json_value_read_if_size_t(size_t * x, json_value const * v) {
+   assert(x);
+   if (v && v->type==json_integer
+         && 0 <= v->u.integer
+         && v->u.integer <= SIZE_MAX)
+   {
+      *x = (size_t)v->u.integer;
+      return true;
+   } else
+      return false;
 }
 
 bool json_value_read_if_float(float * f, json_value const * v) {
